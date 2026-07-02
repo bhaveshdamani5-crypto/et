@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watchtower Agent Tester</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="logo">
+            <span class="pulse"></span>
+            <h1>Agent 1: Watchtower (Global Issue Monitor)</h1>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="issue-input" placeholder="e.g. Taiwan blockade, Venezuela sanctions..." style="padding: 0.75rem 1rem; border-radius: 6px; border: 1px solid var(--border); background: #0b0d11; color: white; width: 350px; font-family: 'Inter', sans-serif;">
+            <button id="run-sim-btn" class="primary-btn">Analyze Global Risk</button>
+        </div>
+    </header>
+
+    <main class="dashboard" style="justify-content: center; align-items: flex-start; padding-top: 2rem;">
+        <section class="agent-panel" style="flex: none; width: 600px;">
+            <div class="agent-card" id="card-watchtower">
+                <div class="card-header">
+                    <span class="icon">📡</span>
+                    <h2>Watchtower Agent</h2>
+                    <span class="status badge-pending" id="status-badge">Waiting</span>
+                </div>
+                <div class="card-body" id="body-watchtower">
+                    <p>Enter any global geopolitical or climate issue in the top right to analyze its real-time impact on global energy supply chains.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+requests
+feedparser
+python-dotenv
+pydantic
+openai
+fastapi
+uvicorn
+numpy
+yfinance
