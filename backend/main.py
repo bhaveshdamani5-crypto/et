@@ -40,26 +40,47 @@ class SimulateRequest(BaseModel):
 def read_root():
     return FileResponse(os.path.join(ROOT_DIR, "frontend", "index.html"))
 
+@app.on_event("startup")
+async def startup_event():
+    import asyncio
+    # Start the continuous 24/7 scanning background loop
+    asyncio.create_task(watchtower.start_monitoring(interval_seconds=120))
+
 @app.get("/favicon.ico")
 def read_favicon():
     return {"status": "dummy"}
 
+@app.get("/api/state")
+def get_state():
+    """Returns all historically monitored projects."""
+    return {"active_issues": list(watchtower.active_issues), "latest_results": watchtower.latest_results}
+
 @app.post("/api/simulate")
 async def run_simulation(req: Optional[SimulateRequest] = None):
-    """Runs the full pipeline starting with the Parser."""
-    
+    """Runs the full pipeline and adds it to the continuous monitor."""
     query = req.issue_query if req and req.issue_query else "Taiwan Blockade"
-    # Agent 0: Parse the user's natural language input
-    crisis_params = await parser_agent.parse_crisis(query)
     
-    # Agent 1: Watchtower uses the optimized search query from the parser
+    # 1. Parse natural language
+    crisis_params = await parser_agent.parse_crisis(query)
     search_query = crisis_params.get("search_query", query)
+    
+    # 2. Add to watchtower and force an immediate cycle
     wt_results = await watchtower.run_cycle(search_query)
     
     return {
         "crisis_params": crisis_params,
         "watchtower": wt_results
     }
+
+@app.post("/api/stop")
+async def stop_simulation(req: dict):
+    issue = req.get("issue_query")
+    if issue in watchtower.active_issues:
+        watchtower.active_issues.remove(issue)
+    if issue in watchtower.latest_results:
+        del watchtower.latest_results[issue]
+    watchtower.save_state()
+    return {"status": "stopped"}
     
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:\Users\BHAVESH\et\et\backend\main.py", line 70, in run_simulation
+    wt_results = await watchtower.run_cycle(search_query)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\BHAVESH\et\et\backend\app\agents\watchtower.py", line 147, in run_cycle
+    import json
+    
+  File "C:\Users\BHAVESH\et\et\backend\app\services\news_service.py", line 29, in fetch_all_news
+    encoded_query = urllib.parse.quote(issue_query)
+  File "C:\Python314\Lib\urllib\parse.py", line 952, in quote
+    return quote_from_bytes(string, safe)
+  File "C:\Python314\Lib\urllib\parse.py", line 982, in quote_from_bytes
+    raise TypeError("quote_from_bytes() expected bytes")
+TypeError: quote_from_bytes() expected bytes

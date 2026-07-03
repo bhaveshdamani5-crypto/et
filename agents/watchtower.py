@@ -169,9 +169,38 @@ class WatchtowerAgent:
             
         return result
 
+def format_output(result: WatchtowerOutput, run_id: str = "scenario_001") -> dict:
+    import datetime
+    signals = result.model_dump()["signals"]
+    
+    # Derive alert level from highest urgency
+    max_urgency = max((s["urgency"] for s in signals), default=0)
+    if max_urgency >= 0.75:
+        alert = "CRITICAL"
+    elif max_urgency >= 0.5:
+        alert = "HIGH"
+    elif max_urgency >= 0.25:
+        alert = "MEDIUM"
+    else:
+        alert = "LOW"
+    
+    return {
+        "agent_id": "watchtower",
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "run_id": run_id,
+        "status": "success",
+        "data": {
+            "alert_level": alert,
+            "signals": signals,
+            "disruption_probability_index": {
+                s["corridor"].lower().replace(" ", "_") + "_route": 
+                int(s["disruption_probability"] * 100)
+                for s in signals
+            }
+        }
+    }
+
 if __name__ == "__main__":
     agent = WatchtowerAgent()
     output = agent.run()
-    
-    print("\n--- WATCHTOWER OUTPUT ---")
-    print(output.model_dump_json(indent=2))
+    print(json.dumps(format_output(output), indent=2))

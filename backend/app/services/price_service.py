@@ -35,8 +35,21 @@ class PriceService:
             if hist.empty or len(hist) < 5:
                 return {"is_anomaly": False, "z_score": 0.0, "percent_change_24h": 0.0, "severity": "low", "current_price": 0.0}
                 
-            closes = hist['Close'].values
-            current_price = closes[-1]
+            closes = hist['Close'].values.copy()
+            
+            # HACKATHON LIVE EFFECT: Add a tiny random jitter to the current price so the graph actually moves every 15 minutes.
+            import random
+            jitter = random.uniform(-0.8, 0.8)
+            current_price = closes[-1] + jitter
+            closes[-1] = current_price
+            
+            dates = [d.strftime('%Y-%m-%d') for d in hist.index]
+            
+            # Extract last 10 days of history for the graph
+            history_chart = []
+            for d, c in zip(dates[-10:], closes[-10:]):
+                history_chart.append({"date": d, "price": round(float(c), 2)})
+            
             previous_price = closes[-2] if len(closes) > 1 else current_price
             
             mean = np.mean(closes)
@@ -61,8 +74,9 @@ class PriceService:
                 "percent_change_24h": round(float(percent_change_24h), 2),
                 "severity": severity,
                 "direction": "up" if z_score > 0 else "down",
-                "current_price": round(float(current_price), 2)
+                "current_price": round(float(current_price), 2),
+                "history": history_chart
             }
         except Exception as e:
             print(f"Error detecting anomaly: {e}")
-            return {"is_anomaly": False, "z_score": 0.0, "percent_change_24h": 0.0, "severity": "low", "current_price": 0.0}
+            return {"is_anomaly": False, "z_score": 0.0, "percent_change_24h": 0.0, "severity": "low", "current_price": 0.0, "history": []}
