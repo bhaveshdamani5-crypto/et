@@ -11,7 +11,7 @@ class CrisisParserAgent:
     Transforms natural language user input into structured crisis parameters.
     """
     def __init__(self):
-        self.nvidia_api_key = "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"
+        self.nvidia_api_key = os.getenv("NVIDIA_API_KEY")
         if self.nvidia_api_key:
             self.llm = OpenAI(
                 base_url="https://integrate.api.nvidia.com/v1",
